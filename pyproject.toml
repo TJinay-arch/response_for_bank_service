@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "application-for-analysis-of-bank-transactions"
+version = "0.1.0"
+description = ""
+authors = ["Ilya Payusov <ilya-payusov@mail.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.13"
+
+
+[tool.poetry.group.lint.dependencies]
+black = "^25.9.0"
+flake8 = "^7.3.0"
+mypy = "^1.18.2"
+isort = "^7.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
