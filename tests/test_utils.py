@@ -1,6 +1,7 @@
 #tests/test_utils.py
 from unittest.mock import patch
-from src.utils import get_greeting, range_of_date
+import pandas as pd
+from src.utils import get_greeting, range_of_date, read_transactions_from_excel_file
 import pytest
 from datetime import datetime
 
@@ -29,3 +30,28 @@ def test_range_of_date(range_testing):
 
     invalid_input = "2021.04.10"
     assert range_of_date(invalid_input) == "Неверный формат даты"
+
+
+def test_read_transactions_from_excel_file(read_excel_testing):
+
+    example_df = pd.DataFrame(read_excel_testing)
+
+    with patch('src.utils.pd.read_excel') as mock_pandas:
+        mock_pandas.return_value = example_df
+        result = read_transactions_from_excel_file()
+
+    assert result[0] == {'MCC': 5411.0,
+                         'Дата операции': '31.12.2021 16:44:00',
+                         'Сумма операции': -160.89
+                         }
+
+
+
+
+
+
+
+
+
+
+
