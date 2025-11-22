@@ -1,12 +1,16 @@
-#src/views.py
-import pprint
-
-from src.utils import (get_greeting, range_of_date, read_transactions_from_excel_file,
-                       range_of_transactions, top_five_transactions_per_card, short_information_about_cards)
+# src/views.py
+import json
 from typing import Dict
 
+from src.utils import (datetime_handler, fetch_exchange_rates,
+                       fetch_stock_price, get_greeting, range_of_date,
+                       range_of_transactions,
+                       read_transactions_from_excel_file,
+                       short_information_about_cards,
+                       top_five_transactions_per_card, user_settings_reader)
 
-def main_view(user_input: str) -> Dict[str, str|float] | str:
+
+def main_view(user_input: str) -> Dict[str, str | float] | str:
     """Function for creating json-response for a bank service"""
     dates = range_of_date(user_input)
     total_transactions = read_transactions_from_excel_file()
@@ -14,19 +18,28 @@ def main_view(user_input: str) -> Dict[str, str|float] | str:
     # получение топ 5 транзакций
     top_5 = top_five_transactions_per_card(user_choice)
     cards = short_information_about_cards(user_choice)
+    currency_rates = fetch_exchange_rates()
+    # получение данных по акциям
+    list_of_stocks = user_settings_reader()["user_stocks"]
+    stock_prices = []
+    for symbol in list_of_stocks:
+        response = fetch_stock_price(symbol)
+        price = response["price"]
+
+        modified_format_of_data = {"stock": symbol, "price": price}
+
+        stock_prices.append(modified_format_of_data)
 
     result = {
-
         "greeting": get_greeting(),
         "cards": cards,
         "top_transactions": top_5,
-        "currency_rates": None,
-        "stock_prices": None
-
+        "currency_rates": currency_rates,
+        "stock_prices": stock_prices,
     }
 
-    return result
+    json_response = json.dumps(
+        result, ensure_ascii=False, indent=4, default=datetime_handler
+    )
 
-if __name__ == "__main__":
-    r = main_view("2020.04.30 10:00:00")
-    pprint.pprint(r)
+    return json_response
